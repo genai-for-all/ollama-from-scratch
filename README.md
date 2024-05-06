@@ -1,1 +1,2 @@
 # Ollama from Scratch
+🚧 wip
