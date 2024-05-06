@@ -1,0 +1,9 @@
+go 1.22.1
+
+use(
+    03-ollama-vanilla-go/01-chat-completion
+    03-ollama-vanilla-go/02-chat-completion
+    03-ollama-vanilla-go/03-chat-completion
+    04-embeddings
+    05-embeddings-llm
+)
