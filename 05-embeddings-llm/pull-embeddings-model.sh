@@ -1,8 +1,10 @@
 #!/bin/bash
 
 #OLLAMA_URL="http://host.docker.internal:11434"
-OLLAMA_URL="http://localhost:11434"
-MODEL="qwen:0.5b"
+#OLLAMA_URL="http://localhost:11434"
+OLLAMA_URL="http://robby.local:11434"
+
+MODEL="all-minilm"
 
 read -r -d '' DATA <<- EOM
 {

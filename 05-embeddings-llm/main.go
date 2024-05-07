@@ -13,8 +13,9 @@ import (
 )
 
 //var ollamaUrl = "http://host.docker.internal:11434"
+//var ollamaUrl = "http://localhost:11434"
+var ollamaUrl = "http://robby.local:11434"
 
-var ollamaUrl = "http://localhost:11434"
 
 // var embeddingsModel = "deepseek-coder"
 // var embeddingsModel = "phi3"
@@ -37,6 +38,7 @@ type Query4Embedding struct {
 }
 
 func CreateEmbedding(ollamaUrl string, query Query4Embedding, id string) (VectorRecord, error) {
+	log.Println("⏳ Creating embedding... ", id)
 	jsonData, err := json.Marshal(query)
 	if err != nil {
 		log.Fatal("😡 Error marshalling JSON:", err)
@@ -154,9 +156,8 @@ func main() {
 
 
 	// a message of the Chat system
-	//userContent := `Who is Philippe Charrière and what spaceship does he work on?`
-	userContent := `What is the nickname of Philippe Charrière?`
-
+	userContent := `Who is Philippe Charrière and what spaceship does he work on?`
+	//userContent := `What is the nickname of Philippe Charrière?`
 
 
 	// Create an embedding from a question
@@ -164,10 +165,12 @@ func main() {
 		ollamaUrl, Query4Embedding{
 			Prompt: userContent,
 			Model:  embeddingsModel},
-		"question-1",
+		"question",
 	)
 
-	fmt.Println(embeddingFromQuestion.Prompt, ":")
+	fmt.Println("🔎 searching for similarity...")
+	fmt.Println("Prompt: ", embeddingFromQuestion.Prompt, ":")
+
 	var maxDistance float64 = 0.0
 	var selectedIdx int
 	for idx, v := range vectorsList {
@@ -178,10 +181,15 @@ func main() {
 		}
 		fmt.Println("  - ", idx, v.Id, distance)
 	}
-	fmt.Println("Selected:", vectorsList[selectedIdx].Prompt)
+	//fmt.Println("🎉 found:", vectorsList[selectedIdx].Prompt)
+	fmt.Println("🎉 found:", vectorsList[selectedIdx].Id)
 	// I take only the nearest vector to the question
 
-	systemContent := `    You are an AI assistant. Your name is Seven. 
+	fmt.Println("")
+
+	fmt.Println("🤖 answer:")
+
+	systemContent := `You are an AI assistant. Your name is Seven. 
     Some people are calling you Seven of Nine.
     You are an expert in Star Trek.
     All questions are about Star Trek.
@@ -189,7 +197,6 @@ func main() {
     to the best of your ability using only the resources provided.`
 
 	documentsContent := `<context><doc>` + vectorsList[selectedIdx].Prompt + `</doc></context>`
-
 
 	query := llm.Query{
 		Model: chatModel,
@@ -199,7 +206,7 @@ func main() {
 			{Role: "user", Content: userContent},
 		},
 		Options: llm.Options{
-			Temperature: 0.5,
+			Temperature: 0.4,
 			RepeatLastN: 2,
 		},
 		Stream: false,
